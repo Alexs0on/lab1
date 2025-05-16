@@ -1,7 +1,5 @@
 ﻿#include "framework.h"
 #include "WindowsProject7.h"
-
-
 #include <set>
 #include <string>
 #include <sstream>
@@ -23,49 +21,52 @@ HWND hEdit2;
 HFONT hFontOutput;
 
 
-bool isValidInput(const string& input) {
+bool isValidInput(const wstring& input) {
     if (input.length() % 4 != 0) {
-        MessageBoxA(NULL, "Строка должна быть кратна 4 символам", "Ошибка", MB_OK | MB_ICONERROR);
+        MessageBoxW(NULL, L"Строка должна быть кратна 4 символам", L"Ошибка", MB_OK | MB_ICONERROR);
         return false;
     }
 
     for (size_t i = 0; i < input.length(); ++i) {
-        char ch = input[i];
+        wchar_t ch = input[i];
         size_t pos = i % 4;
 
-        if (pos == 0 && !isdigit(ch)) {
-            MessageBoxA(NULL, ("Ошибка: ожидается цифра на позиции " + to_string(i)).c_str(), "Ошибка", MB_OK | MB_ICONERROR);
+        if (pos == 0 && !iswdigit(ch)) {
+            wstring msg = L"Ошибка: ожидается цифра на позиции " + to_wstring(i);
+            MessageBoxW(NULL, msg.c_str(), L"Ошибка", MB_OK | MB_ICONERROR);
             return false;
         }
-        else if (pos == 1 && (!isdigit(ch) || (ch - '0') % 2 != 0)) {
-            MessageBoxA(NULL, ("Ошибка: ожидается чётная цифра на позиции " + to_string(i)).c_str(), "Ошибка", MB_OK | MB_ICONERROR);
+        else if (pos == 1 && (!iswdigit(ch) || ((ch - L'0') % 2 != 0))) {
+            wstring msg = L"Ошибка: ожидается чётная цифра на позиции " + to_wstring(i);
+            MessageBoxW(NULL, msg.c_str(), L"Ошибка", MB_OK | MB_ICONERROR);
             return false;
         }
-        else if (pos == 2 && (!isdigit(ch) || (ch - '0') % 2 == 0)) {
-            MessageBoxA(NULL, ("Ошибка: ожидается нечётная цифра на позиции " + to_string(i)).c_str(), "Ошибка", MB_OK | MB_ICONERROR);
+        else if (pos == 2 && (!iswdigit(ch) || ((ch - L'0') % 2 == 0))) {
+            wstring msg = L"Ошибка: ожидается нечётная цифра на позиции " + to_wstring(i);
+            MessageBoxW(NULL, msg.c_str(), L"Ошибка", MB_OK | MB_ICONERROR);
             return false;
         }
-        else if (pos == 3 && !isalpha(ch)) {
-            MessageBoxA(NULL, ("Ошибка: ожидается буква на позиции " + to_string(i)).c_str(), "Ошибка", MB_OK | MB_ICONERROR);
+        else if (pos == 3 && !iswalpha(ch)) {
+            wstring msg = L"Ошибка: ожидается буква на позиции " + to_wstring(i);
+            MessageBoxW(NULL, msg.c_str(), L"Ошибка", MB_OK | MB_ICONERROR);
             return false;
         }
     }
+
     return true;
 }
 
 set<string> inputSet(const wstring& input) {
     set<string> mySet;
-    string strInput(input.begin(), input.end());
 
-    if (!isValidInput(strInput)) {
+    if (!isValidInput(input)) {
         MessageBox(NULL, L"Недопустимый формат ввода!", L"Error", MB_OK | MB_ICONERROR);
         return mySet;
     }
-
-    for (size_t i = 0; i < strInput.length(); i += 4) {
-        mySet.insert(strInput.substr(i, 4));
+    for (size_t i = 0; i < input.length(); i += 4) {
+        string chunk(input.begin() + i, input.begin() + i + 4);  
+        mySet.insert(chunk);
     }
-
     return mySet;
 }
 
